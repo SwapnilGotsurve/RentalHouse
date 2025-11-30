@@ -1,0 +1,7 @@
+| Purpose    | Color         | Hex         |
+| ---------- | ------------- | ----------- |
+| Primary    | Electric Blue | **#2563EB** |
+| Secondary  | Indigo        | **#4F46E5** |
+| Accent     | Neon Green    | **#22C55E** |
+| Background | Off White     | **#F9FAFB** |
+| Neutral    | Slate         | **#334155** |
