@@ -1,16 +1,7 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
 import Navbar from "./components/Navbar";
-import Hero from "./components/Hero";
-import Features from "./components/features";
-import Hero2 from "./components/Hero2";
-import TenantTestimonials from "./components/TenantTestimonials";
 import Footer from "./components/Footer";
-import ShareYourExperiance from "./components/ShareYourExperiance";
 import Home from "./pages/Home";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import RentalHouseInfo from "./components/RentalHouseInfo";
 import Rental from "./pages/Rental";
 import PropertyDetails from "./pages/PropertyDetails";
 import OwnerPanel from "./pages/owner/OwnerPanel";
@@ -22,6 +13,17 @@ import Analytics from "./pages/owner/Analytics";
 import Messages from "./pages/owner/Messages";
 import Documents from "./pages/owner/Documents";
 import Settings from "./pages/owner/Settings";
+import TenantPanel from "./pages/tenant/TenantPanel";
+import TenantDashboard from "./pages/tenant/TenantDashboard";
+import MyLease from "./pages/tenant/MyLease";
+import RentPayment from "./pages/tenant/RentPayment";
+import Maintenance from "./pages/tenant/Maintenance";
+import AdminPanel from "./pages/admin/AdminPanel";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import UsersManagement from "./pages/admin/UsersManagement";
+import PropertiesManagement from "./pages/admin/PropertiesManagement";
+import RevenueAnalytics from "./pages/admin/RevenueAnalytics";
+import SystemMonitoring from "./pages/admin/SystemMonitoring";
 
 function App() {
   return (
@@ -37,6 +39,23 @@ function App() {
           <Route path="messages" element={<Messages />} />
           <Route path="documents" element={<Documents />} />
           <Route path="settings" element={<Settings />} />
+        </Route>
+
+        {/* Tenant Panel Routes - No Navbar/Footer */}
+        <Route path="/tenant-panel" element={<TenantPanel />}>
+          <Route index element={<TenantDashboard />} />
+          <Route path="my-lease" element={<MyLease />} />
+          <Route path="rent-payment" element={<RentPayment />} />
+          <Route path="maintenance" element={<Maintenance />} />
+        </Route>
+
+        {/* Admin Panel Routes - No Navbar/Footer */}
+        <Route path="/admin-panel" element={<AdminPanel />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="users" element={<UsersManagement />} />
+          <Route path="properties" element={<PropertiesManagement />} />
+          <Route path="analytics" element={<RevenueAnalytics />} />
+          <Route path="system-monitoring" element={<SystemMonitoring />} />
         </Route>
 
         {/* Public Routes - With Navbar/Footer */}
