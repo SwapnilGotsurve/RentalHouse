@@ -68,12 +68,12 @@ app.use('/api/public', publicRoutes);
 app.use('/uploads', express.static('uploads'));
 
 // 404 handler - catch all unmatched routes
-// app.all('*', (req, res) => {
-//   res.status(404).json({
-//     success: false,
-//     message: `Route ${req.originalUrl} not found`
-//   });
-// });
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `Route ${req.originalUrl} not found`
+  });
+});
 
 // Error handling middleware
 app.use(errorHandler);

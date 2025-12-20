@@ -52,10 +52,14 @@ router.post('/register', authRateLimit(), validateUserRegistration, asyncHandler
   res.status(201).json({
     success: true,
     message: 'User registered successfully',
-    data: {
-      user,
-      token
-    }
+    user: {
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role
+    },
+    token
   });
 }));
 
@@ -117,10 +121,14 @@ router.post('/login', authRateLimit(), validateUserLogin, asyncHandler(async (re
   res.status(200).json({
     success: true,
     message: 'Login successful',
-    data: {
-      user,
-      token
-    }
+    user: {
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role
+    },
+    token
   });
 }));
 
@@ -148,8 +156,12 @@ router.get('/me', verifyToken, asyncHandler(async (req, res) => {
 
   res.status(200).json({
     success: true,
-    data: {
-      user
+    user: {
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role
     }
   });
 }));

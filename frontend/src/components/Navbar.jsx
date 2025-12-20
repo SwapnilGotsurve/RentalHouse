@@ -1,13 +1,25 @@
 import React, { useState } from "react";
 import { FaHome, FaUserCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
-const Navbar = ({ user = null }) => {
+const Navbar = () => {
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
+  const { user, isAuthenticated, logout, getDashboardRoute } = useAuth();
 
-  // Example user object structure:
-  // user = { name: 'John Doe', profileImage: 'url', email: 'john@example.com' }
+  const handleLogout = async () => {
+    await logout();
+    setShowDropdown(false);
+    navigate('/');
+  };
+
+  const handleDashboard = () => {
+    if (user) {
+      navigate(getDashboardRoute(user.role));
+    }
+    setShowDropdown(false);
+  };
 
   return (
     <div className="fixed w-full flex justify-between items-center p-4 bg-[#005BCB] text-white px-7 z-50">
@@ -28,10 +40,10 @@ const Navbar = ({ user = null }) => {
           onClick={() => setShowDropdown(!showDropdown)}
           className="focus:outline-none hover:opacity-90 transition-opacity"
         >
-          {user && user.profileImage ? (
+          {isAuthenticated && user && user.profileImage ? (
             <img
               src={user.profileImage}
-              alt={user.name}
+              alt={user.fullName || `${user.firstName} ${user.lastName}`}
               className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-lg hover:scale-105 transition-transform duration-200"
             />
           ) : (
@@ -50,29 +62,55 @@ const Navbar = ({ user = null }) => {
 
             {/* Menu */}
             <div className="absolute right-0 top-full mt-3 w-56 bg-white rounded-lg shadow-2xl border border-gray-200 py-2 z-50 text-gray-700">
-              {user ? (
+              {isAuthenticated && user ? (
                 <>
                   {/* User Info */}
                   <div className="px-4 py-3 border-b border-gray-200">
-                    <p className="font-semibold text-gray-800">{user.name}</p>
+                    <p className="font-semibold text-gray-800">
+                      {user.fullName || `${user.firstName} ${user.lastName}`}
+                    </p>
                     <p className="text-sm text-gray-500">{user.email}</p>
+                    <p className="text-xs text-blue-600 capitalize">{user.role}</p>
                   </div>
 
                   {/* Menu Items */}
+                  <button 
+                    onClick={handleDashboard}
+                    className="w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors"
+                  >
+                    My Dashboard
+                  </button>
                   <button className="w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors">
                     My Profile
                   </button>
-                  <button className="w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors">
-                    My Bookings
-                  </button>
-                  <button className="w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors">
-                    Saved Properties
-                  </button>
+                  {user.role === 'tenant' && (
+                    <>
+                      <button className="w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors">
+                        My Bookings
+                      </button>
+                      <button className="w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors">
+                        Saved Properties
+                      </button>
+                    </>
+                  )}
+                  {user.role === 'owner' && (
+                    <>
+                      <button className="w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors">
+                        My Properties
+                      </button>
+                      <button className="w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors">
+                        Bookings
+                      </button>
+                    </>
+                  )}
                   <button className="w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors">
                     Settings
                   </button>
                   <div className="border-t border-gray-200 mt-2 pt-2">
-                    <button className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 transition-colors">
+                    <button 
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 transition-colors"
+                    >
                       Logout
                     </button>
                   </div>
@@ -80,13 +118,19 @@ const Navbar = ({ user = null }) => {
               ) : (
                 <>
                   <button 
-                    onClick={() => navigate('/login')}
+                    onClick={() => {
+                      navigate('/login');
+                      setShowDropdown(false);
+                    }}
                     className="w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors"
                   >
                     Login
                   </button>
                   <button 
-                    onClick={() => navigate('/signup')}
+                    onClick={() => {
+                      navigate('/register');
+                      setShowDropdown(false);
+                    }}
                     className="w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors"
                   >
                     Sign Up

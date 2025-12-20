@@ -26,69 +26,136 @@ import PropertiesManagement from "./pages/admin/PropertiesManagement";
 import RevenueAnalytics from "./pages/admin/RevenueAnalytics";
 import SystemMonitoring from "./pages/admin/SystemMonitoring";
 
+// Authentication components
+import Login from "./pages/auth/Login";
+import Register from "./pages/auth/Register";
+import AuthTest from "./pages/AuthTest";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { AuthProvider } from "./contexts/AuthContext";
+
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Owner Panel Routes - No Navbar/Footer */}
-        <Route path="/owner-panel" element={<OwnerPanel />}>
-          <Route index element={<Dashboard />} />
-          <Route path="properties" element={<MyProperties />} />
-          <Route path="bookings" element={<Bookings />} />
-          <Route path="guests" element={<Guests />} />
-          <Route path="analytics" element={<Analytics />} />
-          <Route path="messages" element={<Messages />} />
-          <Route path="documents" element={<Documents />} />
-          <Route path="settings" element={<Settings />} />
-        </Route>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Authentication Routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/auth-test" element={<AuthTest />} />
 
-        {/* Tenant Panel Routes - No Navbar/Footer */}
-        <Route path="/tenant-panel" element={<TenantPanel />}>
-          <Route index element={<TenantDashboard />} />
-          <Route path="my-lease" element={<MyLease />} />
-          <Route path="rent-payment" element={<RentPayment />} />
-          <Route path="maintenance" element={<Maintenance />} />
-        </Route>
+          {/* Owner Panel Routes - Protected for owners only */}
+          <Route path="/owner/*" element={
+            <ProtectedRoute allowedRoles={['owner']}>
+              <OwnerPanel />
+            </ProtectedRoute>
+          }>
+            <Route index element={<Dashboard />} />
+            <Route path="properties" element={<MyProperties />} />
+            <Route path="bookings" element={<Bookings />} />
+            <Route path="guests" element={<Guests />} />
+            <Route path="analytics" element={<Analytics />} />
+            <Route path="messages" element={<Messages />} />
+            <Route path="documents" element={<Documents />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
 
-        {/* Admin Panel Routes - No Navbar/Footer */}
-        <Route path="/admin-panel" element={<AdminPanel />}>
-          <Route index element={<AdminDashboard />} />
-          <Route path="users" element={<UsersManagement />} />
-          <Route path="properties" element={<PropertiesManagement />} />
-          <Route path="analytics" element={<RevenueAnalytics />} />
-          <Route path="system-monitoring" element={<SystemMonitoring />} />
-        </Route>
+          {/* Legacy owner-panel route - redirect to /owner */}
+          <Route path="/owner-panel/*" element={
+            <ProtectedRoute allowedRoles={['owner']}>
+              <OwnerPanel />
+            </ProtectedRoute>
+          }>
+            <Route index element={<Dashboard />} />
+            <Route path="properties" element={<MyProperties />} />
+            <Route path="bookings" element={<Bookings />} />
+            <Route path="guests" element={<Guests />} />
+            <Route path="analytics" element={<Analytics />} />
+            <Route path="messages" element={<Messages />} />
+            <Route path="documents" element={<Documents />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
 
-        {/* Public Routes - With Navbar/Footer */}
-        <Route path="/" element={
-          <>
-            <Navbar />
-            <Home />
-            <Footer />
-          </>
-        } />
-        <Route path="/search" element={
-          <>
-            <Search />
-            <Footer />
-          </>
-        } />
-        <Route path="/rentalHouseInfo" element={
-          <>
-            <Navbar />
-            <Rental />
-            <Footer />
-          </>
-        } />
-        <Route path="/property/:id" element={
-          <>
-            <Navbar />
-            <PropertyDetails />
-            <Footer />
-          </>
-        } />
-      </Routes>
-    </BrowserRouter>
+          {/* Tenant Panel Routes - Protected for tenants only */}
+          <Route path="/tenant/*" element={
+            <ProtectedRoute allowedRoles={['tenant']}>
+              <TenantPanel />
+            </ProtectedRoute>
+          }>
+            <Route index element={<TenantDashboard />} />
+            <Route path="my-lease" element={<MyLease />} />
+            <Route path="rent-payment" element={<RentPayment />} />
+            <Route path="maintenance" element={<Maintenance />} />
+          </Route>
+
+          {/* Legacy tenant-panel route - redirect to /tenant */}
+          <Route path="/tenant-panel/*" element={
+            <ProtectedRoute allowedRoles={['tenant']}>
+              <TenantPanel />
+            </ProtectedRoute>
+          }>
+            <Route index element={<TenantDashboard />} />
+            <Route path="my-lease" element={<MyLease />} />
+            <Route path="rent-payment" element={<RentPayment />} />
+            <Route path="maintenance" element={<Maintenance />} />
+          </Route>
+
+          {/* Admin Panel Routes - Protected for admins only */}
+          <Route path="/admin/*" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminPanel />
+            </ProtectedRoute>
+          }>
+            <Route index element={<AdminDashboard />} />
+            <Route path="users" element={<UsersManagement />} />
+            <Route path="properties" element={<PropertiesManagement />} />
+            <Route path="analytics" element={<RevenueAnalytics />} />
+            <Route path="system-monitoring" element={<SystemMonitoring />} />
+          </Route>
+
+          {/* Legacy admin-panel route - redirect to /admin */}
+          <Route path="/admin-panel/*" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminPanel />
+            </ProtectedRoute>
+          }>
+            <Route index element={<AdminDashboard />} />
+            <Route path="users" element={<UsersManagement />} />
+            <Route path="properties" element={<PropertiesManagement />} />
+            <Route path="analytics" element={<RevenueAnalytics />} />
+            <Route path="system-monitoring" element={<SystemMonitoring />} />
+          </Route>
+
+          {/* Public Routes - With Navbar/Footer */}
+          <Route path="/" element={
+            <>
+              <Navbar />
+              <Home />
+              <Footer />
+            </>
+          } />
+          <Route path="/search" element={
+            <>
+              <Search />
+              <Footer />
+            </>
+          } />
+          <Route path="/rentalHouseInfo" element={
+            <>
+              <Navbar />
+              <Rental />
+              <Footer />
+            </>
+          } />
+          <Route path="/property/:id" element={
+            <>
+              <Navbar />
+              <PropertyDetails />
+              <Footer />
+            </>
+          } />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
