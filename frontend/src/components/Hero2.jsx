@@ -3,23 +3,22 @@ import { FaArrowRightLong } from "react-icons/fa6";
 
 const Hero2 = () => {
   return (
-    <div className="h-150   flex flex-col justify-center items-center ">
-      <h1 className="text-5xl mb-10">Ready to Find Your Perfect Home?</h1>
-      <p className="text-2xl w-220 text-center mb-10">  
-        Join thousands of happy tenants who found their dream rental with
-        JoinRental. Start your search today and move into your perfect space
-        tomorrow.
-      </p>
+    <div className="bg-gradient-to-br from-gray-50 to-gray-100 py-20 px-4">
+      <div className="max-w-4xl mx-auto text-center">
+        <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
+          Ready to Find Your Perfect Home?
+        </h1>
+        <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+          Join thousands of happy tenants who found their dream rental with
+          JoinRental. Start your search today and move into your perfect space
+          tomorrow.
+        </p>
 
-      <a href="#" className="mt-6 "    >
-        
-        <button className=" bg-blue-100  rounded-xl border-2 p-3 px-8 text-xl flex items-center gap-3 justify-center">
+        <button className="bg-orange-500 hover:bg-orange-600 text-white rounded-full px-8 py-4 text-lg font-semibold flex items-center gap-3 justify-center mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
           Get Started Now
-          <div>
-            <FaArrowRightLong />
-          </div>
+          <FaArrowRightLong />
         </button>
-      </a>
+      </div>
     </div>
   );
 };

@@ -26,7 +26,7 @@ const OwnerPanelLayout = ({ children }) => {
     { path: '/owner-panel/bookings', icon: FaCalendarAlt, label: 'Bookings' },
     { path: '/owner-panel/guests', icon: FaUsers, label: 'Guests' },
     { path: '/owner-panel/analytics', icon: FaChartBar, label: 'Analytics' },
-    { path: '/owner-panel/messages', icon: FaComments, label: 'Messages' },
+    // { path: '/owner-panel/messages', icon: FaComments, label: 'Messages' },
     { path: '/owner-panel/documents', icon: FaFileAlt, label: 'Documents' },
     { path: '/owner-panel/settings', icon: FaCog, label: 'Settings' },
   ];

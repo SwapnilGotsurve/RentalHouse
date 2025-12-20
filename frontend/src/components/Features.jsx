@@ -5,37 +5,37 @@ import { TfiHeadphoneAlt } from "react-icons/tfi";
 import { IoShieldCheckmarkSharp } from "react-icons/io5";
 
 const Features = () => {
+  const features = [
+    { Icon: CiSearch, title: 'Easy Search', color: 'bg-blue-200' },
+    { Icon: IoShieldCheckmarkSharp, title: 'Verified Listings', color: 'bg-blue-200' },
+    { Icon: FaHome, title: 'Wide Selection', color: 'bg-blue-200' },
+    { Icon: TfiHeadphoneAlt, title: '24/7 Support', color: 'bg-blue-200' }
+  ]
+
   return (
-    <div className='bg-amber-200
-     h-160 flex flex-col justify-center  items-center'>
-      <h1 className='text-center text-5xl font-medium '>Why Choose <span>RENTALJOIN  </span></h1>
-      <p className='text-center mt-5 text-2xl'    > We make finding and renting your perfect property simple, secure, and stress-free. </p>
+    <div className='bg-white py-20 px-4'>
+      <div className='max-w-6xl mx-auto'>
+        <h1 className='text-center text-4xl md:text-5xl font-bold text-gray-800'>
+          Why Choose <span className='text-blue-600'>JOINRENTAL</span>
+        </h1>
+        <p className='text-center mt-6 text-lg md:text-xl text-gray-600 max-w-3xl mx-auto'>
+          We make finding and renting your perfect property simple, secure, and stress-free.
+        </p>
 
-      {/* icons  */}
-      <div className='  mt-16   grid grid-cols-4 gap-18    '>
-        {/* 1 */}
-                <div className='flex flex-col justify-center items-center'>
-                    <div className='text-6xl h-29 w-29 bg-blue-300 flex items-center justify-center p-3 rounded-xl'> <CiSearch /> </div>
-                    <p className='text-2xl mt-3 '>Easy Search</p>
-                </div>
-        {/* 2 */}   
-        <div className='flex flex-col justify-center items-center'>
-                    <div className='text-6xl h-29 w-29 bg-blue-300 flex items-center justify-center p-3 rounded-xl'> <IoShieldCheckmarkSharp /></div>
-                    <p className='text-2xl mt-3 '>Verified Listings</p>
-                </div>
-        {/* 3 */}   
-        <div className='flex flex-col justify-center items-center'>
-                    <div className='text-6xl h-29 w-29 bg-blue-300 flex items-center justify-center p-3 rounded-xl'> <FaHome /></div>
-                    <p className='text-2xl mt-3 '>Wide Selection</p>
-                </div>
-                {/* 4 */}
-                <div className='flex flex-col justify-center items-center'>
-                    <div className='text-6xl h-29 w-29 bg-blue-300 flex items-center justify-center p-3 rounded-xl'> <TfiHeadphoneAlt /> </div>
-                    <p className='text-2xl mt-3 '>24/7 Support</p>
-                </div>  
-      </div>
-      <div>
-
+        {/* Features Grid */}
+        <div className='mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12'>
+          {features.map((feature, index) => (
+            <div 
+              key={index} 
+              className='flex flex-col justify-center items-center transform transition-transform hover:scale-105 duration-300'
+            >
+              <div className={`text-6xl h-28 w-28 ${feature.color} flex items-center justify-center rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300`}>
+                <feature.Icon className='text-blue-600' />
+              </div>
+              <p className='text-xl font-semibold mt-4 text-gray-700'>{feature.title}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
