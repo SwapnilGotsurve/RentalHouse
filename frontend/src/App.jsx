@@ -15,6 +15,7 @@ import Analytics from "./pages/owner/Analytics";
 import Messages from "./pages/owner/Messages";
 import Documents from "./pages/owner/Documents";
 import Settings from "./pages/owner/Settings";
+import EditProperty from "./pages/owner/EditProperty";
 import PropertyDetail from "./pages/owner/PropertyDetail";
 import OwnerRentalRequests from "./pages/owner/RentalRequests";
 import TenantPanel from "./pages/tenant/TenantPanel";
@@ -56,6 +57,7 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="properties" element={<MyProperties />} />
             <Route path="properties/:id" element={<PropertyDetail />} />
+            <Route path="properties/:id/edit" element={<EditProperty />} />
             <Route path="add-property" element={<AddProperty />} />
             <Route path="bookings" element={<Bookings />} />
             <Route path="rental-requests" element={<OwnerRentalRequests />} />
@@ -74,6 +76,7 @@ function App() {
           }>
             <Route index element={<Dashboard />} />
             <Route path="properties" element={<MyProperties />} />
+            <Route path="properties/:id/edit" element={<EditProperty />} />
             <Route path="add-property" element={<AddProperty />} />
             <Route path="bookings" element={<Bookings />} />
             <Route path="rental-requests" element={<OwnerRentalRequests />} />

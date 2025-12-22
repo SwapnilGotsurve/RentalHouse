@@ -239,8 +239,11 @@ propertySchema.virtual('bhkFormat').get(function() {
 
 // Virtual for primary image
 propertySchema.virtual('primaryImage').get(function() {
+  if (!this.images || !Array.isArray(this.images) || this.images.length === 0) {
+    return null;
+  }
   const primary = this.images.find(img => img.isPrimary);
-  return primary ? primary.url : (this.images.length > 0 ? this.images[0].url : null);
+  return primary ? primary.url : this.images[0].url;
 });
 
 // Virtual fields to match frontend expectations

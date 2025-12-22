@@ -29,7 +29,7 @@ const TenantDashboard = () => {
       const token = localStorage.getItem('token');
       
       // Fetch liked properties count
-      const likedResponse = await fetch('/api/liked-properties', {
+      const likedResponse = await fetch('http://localhost:5000/api/liked-properties', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const likedData = await likedResponse.json();

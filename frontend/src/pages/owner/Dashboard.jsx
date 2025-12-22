@@ -235,7 +235,7 @@ const Dashboard = () => {
                         {request.tenant.firstName} {request.tenant.lastName}
                       </p>
                       <p className="text-sm text-gray-600">
-                        {request.property ? request.property.title : 'Property information unavailable'}
+                        {request.property && request.property.title ? request.property.title : 'Property information unavailable'}
                       </p>
                       <p className="text-xs text-gray-500">
                         Applied: {new Date(request.createdAt).toLocaleDateString()}

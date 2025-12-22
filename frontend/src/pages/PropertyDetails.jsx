@@ -48,16 +48,13 @@ const PropertyDetails = () => {
   const checkIfLiked = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/liked-properties', {
+      const response = await fetch(`http://localhost:5000/api/liked-properties/check/${id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
       
       if (data.success) {
-        const isLiked = data.data.likedProperties.some(
-          likedProp => likedProp.property._id === id
-        );
-        setLiked(isLiked);
+        setLiked(data.data.isLiked);
       }
     } catch (error) {
       console.error('Error checking liked status:', error);
@@ -73,15 +70,14 @@ const PropertyDetails = () => {
     try {
       const token = localStorage.getItem('token');
       const method = liked ? 'DELETE' : 'POST';
-      const url = liked ? `/api/liked-properties/${id}` : '/api/liked-properties';
+      const url = `/api/liked-properties/${id}`;
       
-      const response = await fetch(url, {
+      const response = await fetch(`http://localhost:5000${url}`, {
         method,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
-        },
-        body: method === 'POST' ? JSON.stringify({ property: id }) : undefined
+        }
       });
       
       const data = await response.json();

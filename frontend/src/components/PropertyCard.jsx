@@ -27,25 +27,23 @@ const PropertyCard = ({ property, onFavorite, onApply }) => {
 
     try {
       const token = localStorage.getItem('token');
-      const method = isLiked ? 'DELETE' : 'POST';
-      const url = isLiked ? `/api/liked-properties/${property._id}` : '/api/liked-properties';
-      
-      const response = await fetch(url, {
-        method,
+      const response = await fetch(`http://localhost:5000/api/liked-properties/${property._id}`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
-        },
-        body: method === 'POST' ? JSON.stringify({ property: property._id }) : undefined
+        }
       });
       
       const data = await response.json();
       
       if (data.success) {
-        setIsLiked(!isLiked);
+        setIsLiked(data.data.isLiked);
         if (onFavorite) {
-          onFavorite(property, !isLiked);
+          onFavorite(property, data.data.isLiked);
         }
+      } else {
+        console.error('Error toggling favorite:', data.message);
       }
     } catch (error) {
       console.error('Error toggling favorite:', error);

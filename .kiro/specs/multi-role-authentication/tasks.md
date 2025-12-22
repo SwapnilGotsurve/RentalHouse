@@ -95,7 +95,7 @@
   - Implement role-based dashboard redirects after login
   - _Requirements: 1.3, 2.2, 3.1, 3.2, 3.3_
 
-- [ ] 9. Connect frontend authentication with backend APIs
+- [x] 9. Connect frontend authentication with backend APIs
   - Implement API calls for login, register, and logout
   - Add JWT token to API request headers
   - Handle authentication errors and token expiration
