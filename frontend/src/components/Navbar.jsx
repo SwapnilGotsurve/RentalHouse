@@ -24,7 +24,7 @@ const Navbar = () => {
   return (
     <div className="fixed w-full flex justify-between items-center p-4 bg-[#005BCB] text-white px-7 z-50">
       {/* Logo */}
-      <div 
+      <div
         className="flex justify-center items-center gap-4 h-13 cursor-pointer hover:opacity-90 transition-opacity"
         onClick={() => navigate('/')}
       >
@@ -36,18 +36,18 @@ const Navbar = () => {
 
       {/* User Profile */}
       <div className="relative">
-        <button
+<button
           onClick={() => setShowDropdown(!showDropdown)}
           className="focus:outline-none hover:opacity-90 transition-opacity"
         >
-          {isAuthenticated && user && user.profileImage ? (
-            <img
-              src={user.profileImage}
-              alt={user.fullName || `${user.firstName} ${user.lastName}`}
-              className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-lg hover:scale-105 transition-transform duration-200"
-            />
+          {isAuthenticated && user ? (
+            <div className="w-12 h-12 rounded-full bg-white text-[#005BCB] border-2 border-white shadow-lg hover:scale-105 transition-transform duration-200 flex items-center justify-center font-bold text-lg">
+              {(user.fullName || user.firstName || '').charAt(0).toUpperCase()}
+            </div>
           ) : (
-            <FaUserCircle className="text-4xl" />
+            <div className="w-12 h-12 rounded-full bg-white text-[#005BCB] border-2 border-white shadow-lg hover:scale-105 transition-transform duration-200 flex items-center justify-center">
+              <FaUserCircle className="text-2xl" />
+            </div>
           )}
         </button>
 
@@ -74,7 +74,7 @@ const Navbar = () => {
                   </div>
 
                   {/* Menu Items */}
-                  <button 
+                  <button
                     onClick={handleDashboard}
                     className="w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors"
                   >
@@ -107,7 +107,7 @@ const Navbar = () => {
                     Settings
                   </button>
                   <div className="border-t border-gray-200 mt-2 pt-2">
-                    <button 
+                    <button
                       onClick={handleLogout}
                       className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 transition-colors"
                     >
@@ -117,7 +117,7 @@ const Navbar = () => {
                 </>
               ) : (
                 <>
-                  <button 
+                  <button
                     onClick={() => {
                       navigate('/login');
                       setShowDropdown(false);
@@ -126,7 +126,7 @@ const Navbar = () => {
                   >
                     Login
                   </button>
-                  <button 
+                  <button
                     onClick={() => {
                       navigate('/register');
                       setShowDropdown(false);
