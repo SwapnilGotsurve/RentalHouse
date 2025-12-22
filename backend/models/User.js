@@ -108,6 +108,43 @@ const userSchema = new mongoose.Schema({
     lastLogin: Date
   },
   
+  // Notifications
+  notifications: [{
+    type: {
+      type: String,
+      enum: ['rental_approved', 'rental_rejected', 'rental_pending', 'payment_due', 'maintenance', 'message', 'system'],
+      required: true
+    },
+    title: {
+      type: String,
+      required: true
+    },
+    message: {
+      type: String,
+      required: true
+    },
+    rentalRequest: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'RentalRequest'
+    },
+    property: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Property'
+    },
+    booking: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Booking'
+    },
+    read: {
+      type: Boolean,
+      default: false
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
+  
   // Timestamps
   lastLoginAt: Date,
   createdAt: {
@@ -131,7 +168,9 @@ userSchema.virtual('fullName').get(function() {
 
 // Virtual for initials
 userSchema.virtual('initials').get(function() {
-  return `${this.firstName.charAt(0)}${this.lastName.charAt(0)}`.toUpperCase();
+  const first = this.firstName ? this.firstName.charAt(0) : '';
+  const last = this.lastName ? this.lastName.charAt(0) : '';
+  return `${first}${last}`.toUpperCase();
 });
 
 // Pre-save middleware to hash password

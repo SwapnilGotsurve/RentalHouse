@@ -8,17 +8,21 @@ import PropertyDetails from "./pages/PropertyDetails";
 import OwnerPanel from "./pages/owner/OwnerPanel";
 import Dashboard from "./pages/owner/Dashboard";
 import MyProperties from "./pages/owner/MyProperties";
+import AddProperty from "./pages/owner/AddProperty";
 import Bookings from "./pages/owner/Bookings";
 import Guests from "./pages/owner/Guests";
 import Analytics from "./pages/owner/Analytics";
 import Messages from "./pages/owner/Messages";
 import Documents from "./pages/owner/Documents";
 import Settings from "./pages/owner/Settings";
+import PropertyDetail from "./pages/owner/PropertyDetail";
+import OwnerRentalRequests from "./pages/owner/RentalRequests";
 import TenantPanel from "./pages/tenant/TenantPanel";
 import TenantDashboard from "./pages/tenant/TenantDashboard";
 import MyLease from "./pages/tenant/MyLease";
-import RentPayment from "./pages/tenant/RentPayment";
 import Maintenance from "./pages/tenant/Maintenance";
+import LikedProperties from "./pages/tenant/LikedProperties";
+import RentalRequests from "./pages/tenant/RentalRequests";
 import AdminPanel from "./pages/admin/AdminPanel";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UsersManagement from "./pages/admin/UsersManagement";
@@ -51,7 +55,10 @@ function App() {
           }>
             <Route index element={<Dashboard />} />
             <Route path="properties" element={<MyProperties />} />
+            <Route path="properties/:id" element={<PropertyDetail />} />
+            <Route path="add-property" element={<AddProperty />} />
             <Route path="bookings" element={<Bookings />} />
+            <Route path="rental-requests" element={<OwnerRentalRequests />} />
             <Route path="guests" element={<Guests />} />
             <Route path="analytics" element={<Analytics />} />
             <Route path="messages" element={<Messages />} />
@@ -67,7 +74,9 @@ function App() {
           }>
             <Route index element={<Dashboard />} />
             <Route path="properties" element={<MyProperties />} />
+            <Route path="add-property" element={<AddProperty />} />
             <Route path="bookings" element={<Bookings />} />
+            <Route path="rental-requests" element={<OwnerRentalRequests />} />
             <Route path="guests" element={<Guests />} />
             <Route path="analytics" element={<Analytics />} />
             <Route path="messages" element={<Messages />} />
@@ -83,8 +92,9 @@ function App() {
           }>
             <Route index element={<TenantDashboard />} />
             <Route path="my-lease" element={<MyLease />} />
-            <Route path="rent-payment" element={<RentPayment />} />
             <Route path="maintenance" element={<Maintenance />} />
+            <Route path="liked-properties" element={<LikedProperties />} />
+            <Route path="rental-requests" element={<RentalRequests />} />
           </Route>
 
           {/* Legacy tenant-panel route - redirect to /tenant */}
@@ -95,8 +105,9 @@ function App() {
           }>
             <Route index element={<TenantDashboard />} />
             <Route path="my-lease" element={<MyLease />} />
-            <Route path="rent-payment" element={<RentPayment />} />
             <Route path="maintenance" element={<Maintenance />} />
+            <Route path="liked-properties" element={<LikedProperties />} />
+            <Route path="rental-requests" element={<RentalRequests />} />
           </Route>
 
           {/* Admin Panel Routes - Protected for admins only */}

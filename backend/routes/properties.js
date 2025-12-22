@@ -8,6 +8,346 @@ import { asyncHandler } from '../middleware/errorHandler.js';
 
 const router = express.Router();
 
+// @desc    Get featured properties for landing page
+// @route   GET /api/properties/featured
+// @access  Public
+router.get('/featured', optionalAuth, asyncHandler(async (req, res) => {
+  const limit = parseInt(req.query.limit) || 8;
+  
+  // Get featured properties (recently added, high views, or manually featured)
+  const featuredProperties = await Property.find({
+    isActive: true,
+    'availability.status': 'available'
+  })
+    .populate('owner', 'firstName lastName profileImage')
+    .sort({ 
+      featured: -1,  // Featured properties first
+      views: -1,     // Then by popularity
+      createdAt: -1  // Then by recency
+    })
+    .limit(limit);
+  
+  res.status(200).json({
+    success: true,
+    data: {
+      properties: featuredProperties
+    }
+  });
+}));
+
+// @desc    Enhanced search for landing page with suggestions
+// @route   GET /api/properties/search
+// @access  Public
+router.get('/search', optionalAuth, asyncHandler(async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 12;
+  const skip = (page - 1) * limit;
+  
+  const {
+    q, location, minRent, maxRent, bedrooms, bathrooms, propertyType, 
+    furnishing, availableFor, amenities, sortBy
+  } = req.query;
+  
+  // Build query
+  const query = { 
+    isActive: true, 
+    'availability.status': 'available' 
+  };
+  
+  // Text search across multiple fields
+  if (q) {
+    query.$or = [
+      { title: { $regex: q, $options: 'i' } },
+      { description: { $regex: q, $options: 'i' } },
+      { 'location.address': { $regex: q, $options: 'i' } },
+      { 'location.city': { $regex: q, $options: 'i' } },
+      { 'location.state': { $regex: q, $options: 'i' } }
+    ];
+  }
+  
+  // Location filter
+  if (location) {
+    query['location.city'] = { $regex: location, $options: 'i' };
+  }
+  
+  // Price range
+  if (minRent || maxRent) {
+    query['rent.amount'] = {};
+    if (minRent) query['rent.amount'].$gte = parseFloat(minRent);
+    if (maxRent) query['rent.amount'].$lte = parseFloat(maxRent);
+  }
+  
+  // Room filters
+  if (bedrooms) {
+    query.bedrooms = parseInt(bedrooms);
+  }
+  
+  if (bathrooms) {
+    query.bathrooms = parseInt(bathrooms);
+  }
+  
+  // Property type
+  if (propertyType) {
+    query.propertyType = propertyType;
+  }
+  
+  // Furnishing status
+  if (furnishing) {
+    query.furnishingStatus = furnishing;
+  }
+  
+  // Available for
+  if (availableFor) {
+    query['preferences.tenantType'] = availableFor;
+  }
+  
+  // Amenities
+  if (amenities) {
+    const amenitiesArray = Array.isArray(amenities) ? amenities : amenities.split(',');
+    query.amenities = { $in: amenitiesArray };
+  }
+  
+  // Build sort
+  let sort = { createdAt: -1 };
+  
+  switch (sortBy) {
+    case 'price_asc':
+      sort = { 'rent.amount': 1 };
+      break;
+    case 'price_desc':
+      sort = { 'rent.amount': -1 };
+      break;
+    case 'date_desc':
+      sort = { createdAt: -1 };
+      break;
+    case 'relevance':
+      // For relevance, we can use a combination of factors
+      sort = { featured: -1, views: -1, createdAt: -1 };
+      break;
+  }
+  
+  const properties = await Property.find(query)
+    .populate('owner', 'firstName lastName profileImage')
+    .sort(sort)
+    .skip(skip)
+    .limit(limit);
+  
+  const total = await Property.countDocuments(query);
+  
+  // Get available filter options for the current search
+  const availableFilters = await Property.aggregate([
+    { $match: { isActive: true, 'availability.status': 'available' } },
+    {
+      $group: {
+        _id: null,
+        cities: { $addToSet: '$location.city' },
+        propertyTypes: { $addToSet: '$propertyType' },
+        furnishingOptions: { $addToSet: '$furnishingStatus' },
+        availableForOptions: { $addToSet: '$preferences.tenantType' },
+        minRent: { $min: '$rent.amount' },
+        maxRent: { $max: '$rent.amount' },
+        maxBedrooms: { $max: '$bedrooms' },
+        maxBathrooms: { $max: '$bathrooms' }
+      }
+    }
+  ]);
+  
+  res.status(200).json({
+    success: true,
+    data: {
+      properties,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
+      },
+      filters: {
+        applied: {
+          q, location, minRent, maxRent, bedrooms, bathrooms, 
+          propertyType, furnishing, availableFor, amenities, sortBy
+        },
+        available: availableFilters[0] || {}
+      }
+    }
+  });
+}));
+
+// @desc    Get search suggestions for autocomplete
+// @route   GET /api/properties/suggestions
+// @access  Public
+router.get('/suggestions', asyncHandler(async (req, res) => {
+  const { q } = req.query;
+  
+  if (!q || q.length < 2) {
+    return res.status(200).json({
+      success: true,
+      data: { suggestions: [] }
+    });
+  }
+  
+  // Get city suggestions
+  const citySuggestions = await Property.aggregate([
+    {
+      $match: {
+        isActive: true,
+        'location.city': { $regex: q, $options: 'i' }
+      }
+    },
+    {
+      $group: {
+        _id: '$location.city',
+        count: { $sum: 1 }
+      }
+    },
+    { $sort: { count: -1 } },
+    { $limit: 5 }
+  ]);
+  
+  // Get property title suggestions
+  const propertySuggestions = await Property.find({
+    isActive: true,
+    title: { $regex: q, $options: 'i' }
+  })
+    .select('title location.city')
+    .limit(3);
+  
+  const suggestions = [
+    ...citySuggestions.map(city => ({
+      type: 'city',
+      text: city._id,
+      count: city.count
+    })),
+    ...propertySuggestions.map(property => ({
+      type: 'property',
+      text: property.title,
+      location: property.location.city
+    }))
+  ];
+  
+  res.status(200).json({
+    success: true,
+    data: { suggestions }
+  });
+}));
+
+// @desc    Get property statistics
+// @route   GET /api/properties/stats/overview
+// @access  Private/Admin
+router.get('/stats/overview',
+  verifyToken,
+  authorize('admin'),
+  asyncHandler(async (req, res) => {
+    const totalProperties = await Property.countDocuments();
+    const activeProperties = await Property.countDocuments({ isActive: true });
+    const availableProperties = await Property.countDocuments({ 
+      isActive: true, 
+      'availability.status': 'available' 
+    });
+    
+    const propertiesByType = await Property.aggregate([
+      { $match: { isActive: true } },
+      {
+        $group: {
+          _id: '$propertyType',
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+    
+    const propertiesByCity = await Property.aggregate([
+      { $match: { isActive: true } },
+      {
+        $group: {
+          _id: '$location.city',
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { count: -1 } },
+      { $limit: 10 }
+    ]);
+    
+    const averageRent = await Property.aggregate([
+      { $match: { isActive: true } },
+      {
+        $group: {
+          _id: null,
+          averageRent: { $avg: '$rent.amount' },
+          minRent: { $min: '$rent.amount' },
+          maxRent: { $max: '$rent.amount' }
+        }
+      }
+    ]);
+    
+    res.status(200).json({
+      success: true,
+      data: {
+        overview: {
+          totalProperties,
+          activeProperties,
+          availableProperties,
+          occupiedProperties: activeProperties - availableProperties
+        },
+        propertiesByType: propertiesByType.reduce((acc, item) => {
+          acc[item._id] = item.count;
+          return acc;
+        }, {}),
+        propertiesByCity,
+        rentStatistics: averageRent[0] || { averageRent: 0, minRent: 0, maxRent: 0 }
+      }
+    });
+  })
+);
+
+// @desc    Get properties by owner
+// @route   GET /api/properties/owner/:ownerId
+// @access  Private
+router.get('/owner/:ownerId',
+  verifyToken,
+  validateObjectIdParam('ownerId'),
+  asyncHandler(async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    
+    // Users can only view their own properties unless they're admin
+    if (req.user.role !== 'admin' && !req.user._id.equals(req.params.ownerId)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied'
+      });
+    }
+    
+    const query = { owner: req.params.ownerId };
+    
+    // Non-owners can only see active properties
+    if (!req.user._id.equals(req.params.ownerId) && req.user.role !== 'admin') {
+      query.isActive = true;
+    }
+    
+    const properties = await Property.find(query)
+      .populate('owner', 'firstName lastName profileImage')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+    
+    const total = await Property.countDocuments(query);
+    
+    res.status(200).json({
+      success: true,
+      data: {
+        properties,
+        pagination: {
+          page,
+          limit,
+          total,
+          pages: Math.ceil(total / limit)
+        }
+      }
+    });
+  })
+);
+
 // @desc    Get all properties with search and filters
 // @route   GET /api/properties
 // @access  Public
@@ -172,7 +512,7 @@ router.post('/',
     // Add uploaded images
     if (req.files && req.files.length > 0) {
       propertyData.images = req.files.map((file, index) => ({
-        url: file.url,
+        url: file.path, // Cloudinary returns the full URL in file.path
         caption: req.body.imageCaptions ? req.body.imageCaptions[index] : '',
         isPrimary: index === 0 // First image is primary
       }));
@@ -220,7 +560,7 @@ router.put('/:id',
     // Handle new images
     if (req.files && req.files.length > 0) {
       const newImages = req.files.map(file => ({
-        url: file.url,
+        url: file.path, // Cloudinary returns the full URL in file.path
         caption: '',
         isPrimary: false
       }));
@@ -339,7 +679,7 @@ router.put('/:id/images',
     // Add new images
     if (req.files && req.files.length > 0) {
       const newImages = req.files.map(file => ({
-        url: file.url,
+        url: file.path, // Cloudinary returns the full URL in file.path
         caption: '',
         isPrimary: false
       }));
@@ -464,101 +804,5 @@ router.get('/stats/overview',
     });
   })
 );
-
-// @desc    Search properties with advanced filters
-// @route   POST /api/properties/search
-// @access  Public
-router.post('/search', optionalAuth, asyncHandler(async (req, res) => {
-  const {
-    location, priceRange, bedrooms, propertyTypes, amenities,
-    furnishingStatus, availableFrom, tenantType, coordinates, radius
-  } = req.body;
-  
-  const page = parseInt(req.body.page) || 1;
-  const limit = parseInt(req.body.limit) || 12;
-  const skip = (page - 1) * limit;
-  
-  const query = { isActive: true, 'availability.status': 'available' };
-  
-  // Location-based search
-  if (location) {
-    query.$or = [
-      { 'location.city': { $regex: location, $options: 'i' } },
-      { 'location.state': { $regex: location, $options: 'i' } },
-      { 'location.address': { $regex: location, $options: 'i' } }
-    ];
-  }
-  
-  // Geolocation search
-  if (coordinates && radius) {
-    query['location.coordinates'] = {
-      $near: {
-        $geometry: {
-          type: 'Point',
-          coordinates: [coordinates.longitude, coordinates.latitude]
-        },
-        $maxDistance: radius * 1000 // Convert km to meters
-      }
-    };
-  }
-  
-  // Price range
-  if (priceRange) {
-    query['rent.amount'] = {};
-    if (priceRange.min) query['rent.amount'].$gte = priceRange.min;
-    if (priceRange.max) query['rent.amount'].$lte = priceRange.max;
-  }
-  
-  // Bedrooms
-  if (bedrooms && bedrooms.length > 0) {
-    query.bedrooms = { $in: bedrooms };
-  }
-  
-  // Property types
-  if (propertyTypes && propertyTypes.length > 0) {
-    query.propertyType = { $in: propertyTypes };
-  }
-  
-  // Amenities
-  if (amenities && amenities.length > 0) {
-    query.amenities = { $all: amenities };
-  }
-  
-  // Furnishing status
-  if (furnishingStatus && furnishingStatus.length > 0) {
-    query.furnishingStatus = { $in: furnishingStatus };
-  }
-  
-  // Available from date
-  if (availableFrom) {
-    query['availability.availableFrom'] = { $lte: new Date(availableFrom) };
-  }
-  
-  // Tenant type preference
-  if (tenantType) {
-    query['preferences.tenantType'] = { $in: [tenantType, 'any'] };
-  }
-  
-  const properties = await Property.find(query)
-    .populate('owner', 'firstName lastName profileImage')
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit);
-  
-  const total = await Property.countDocuments(query);
-  
-  res.status(200).json({
-    success: true,
-    data: {
-      properties,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit)
-      }
-    }
-  });
-}));
 
 export default router;

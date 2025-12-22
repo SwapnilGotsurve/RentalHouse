@@ -60,16 +60,7 @@ const Bookings = () => {
           <h1 className="text-4xl font-bold text-gray-800 mb-2">Bookings</h1>
           <p className="text-gray-600">Track and manage {bookings.length} guest reservations.</p>
         </div>
-        <div className="flex gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
-            <FaFilter className="text-gray-600" />
-            <span className="text-gray-700">Filter</span>
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
-            <FaDownload className="text-gray-600" />
-            <span className="text-gray-700">Export</span>
-          </button>
-        </div>
+   
       </div>
 
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">

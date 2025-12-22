@@ -337,4 +337,92 @@ router.put('/:id/role-info',
   })
 );
 
+// @desc    Get user notifications
+// @route   GET /api/users/me/notifications
+// @access  Private
+router.get('/me/notifications', asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id).select('notifications');
+  
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: 'User not found'
+    });
+  }
+  
+  // Sort notifications by createdAt (newest first)
+  const notifications = (user.notifications || []).sort((a, b) => {
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
+  
+  const unreadCount = notifications.filter(n => !n.read).length;
+  
+  res.status(200).json({
+    success: true,
+    data: {
+      notifications,
+      unreadCount
+    }
+  });
+}));
+
+// @desc    Mark notification as read
+// @route   PATCH /api/users/me/notifications/:notificationId
+// @access  Private
+router.patch('/me/notifications/:notificationId', asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: 'User not found'
+    });
+  }
+  
+  const notification = user.notifications.id(req.params.notificationId);
+  
+  if (!notification) {
+    return res.status(404).json({
+      success: false,
+      message: 'Notification not found'
+    });
+  }
+  
+  notification.read = true;
+  await user.save();
+  
+  res.status(200).json({
+    success: true,
+    message: 'Notification marked as read',
+    data: {
+      notification
+    }
+  });
+}));
+
+// @desc    Mark all notifications as read
+// @route   PATCH /api/users/me/notifications
+// @access  Private
+router.patch('/me/notifications', asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: 'User not found'
+    });
+  }
+  
+  user.notifications.forEach(notification => {
+    notification.read = true;
+  });
+  
+  await user.save();
+  
+  res.status(200).json({
+    success: true,
+    message: 'All notifications marked as read'
+  });
+}));
+
 export default router;

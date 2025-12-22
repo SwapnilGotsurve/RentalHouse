@@ -99,10 +99,10 @@ const PropertyCard = ({ property }) => {
             {/* Price */}
             <div className='bg-white rounded-lg p-3 shadow-sm border border-gray-100'>
               <p className='text-lg font-bold text-blue-600'>
-                ₹{property.price.toLocaleString()} / month
+                ₹{(property.price || property.rent?.amount || property.rentAmount || 0).toLocaleString()} / month
               </p>
               <p className='text-xs text-gray-500'>
-                ₹{property.deposit.toLocaleString()} deposit
+                ₹{(property.deposit || property.securityDeposit || property.depositAmount || 0).toLocaleString()} deposit
               </p>
             </div>
 
@@ -110,7 +110,7 @@ const PropertyCard = ({ property }) => {
             <div className='bg-white rounded-lg p-3 shadow-sm border border-gray-100'>
               <p className='text-lg font-bold text-gray-800 flex items-center gap-1'>
                 <FaRulerCombined className='text-blue-500' />
-                {property.area} sqft
+                {property.area?.value || property.areaValue || 0} {property.area?.unit || 'sqft'}
               </p>
               <p className='text-xs text-gray-500'>Buildup Area</p>
             </div>

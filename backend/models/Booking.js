@@ -150,7 +150,7 @@ const bookingSchema = new mongoose.Schema({
     },
     approvalDate: Date,
     moveInDate: Date,
-    moveOutDate: Date,
+    moveOutDate: Date, 
     nextRentDue: Date,
     lastInspectionDate: Date,
     nextInspectionDate: Date

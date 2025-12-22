@@ -108,7 +108,9 @@ const Register = () => {
     const result = await register(formData.firstName, formData.lastName, formData.email, formData.password, formData.role);
     
     if (result.success) {
-      navigate(getDashboardRoute(result.user.role), { replace: true });
+      // Navigate to the appropriate dashboard
+      const redirectTo = result.redirectTo || getDashboardRoute(result.user.role);
+      navigate(redirectTo, { replace: true });
     }
   };
 

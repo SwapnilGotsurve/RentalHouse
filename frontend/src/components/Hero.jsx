@@ -3,7 +3,7 @@ import SearchBar from './SearchBar'
 import { FaHome, FaKey, FaBuilding, FaHeart, FaShieldAlt, FaUsers } from 'react-icons/fa'
 import { gsap } from 'gsap'
 
-const Hero = () => {
+const Hero = ({ onSearch }) => {
   const iconsRef = useRef([])
 
   useEffect(() => {
@@ -56,7 +56,7 @@ const Hero = () => {
         <p className='text-center text-xl text-white/90 mb-8'>
           From cozy apartments to luxury homes, your dream space is just a search away.
         </p>
-        <SearchBar />
+        <SearchBar onSearch={onSearch} showResults={true} />
       </div>
     </div>
   )

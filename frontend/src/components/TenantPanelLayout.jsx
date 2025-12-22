@@ -1,31 +1,39 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { 
   FaHome, 
   FaCreditCard, 
   FaTools, 
   FaUser,
   FaSearch,
-  FaQuestionCircle,
-  FaMoon,
+  FaSignOutAlt,
   FaBell,
-  FaSignOutAlt
+  FaCog,
+  FaHeart
 } from 'react-icons/fa';
+import { HiOutlineSquares2X2 } from 'react-icons/hi2';
 
 const TenantPanelLayout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  };
 
   const navItems = [
-    { path: '/tenant-panel', icon: FaHome, label: 'Dashboard' },
-    { path: '/tenant-panel/my-lease', icon: FaHome, label: 'My Lease' },
-    { path: '/tenant-panel/rent-payment', icon: FaCreditCard, label: 'Rent Payment' },
-    { path: '/tenant-panel/maintenance', icon: FaTools, label: 'Maintenance' },
+    { path: '/tenant', icon: HiOutlineSquares2X2, label: 'Dashboard' },
+    { path: '/tenant/liked-properties', icon: FaHeart, label: 'Liked Properties' },
+    { path: '/tenant/rental-requests', icon: FaHome, label: 'My Applications' },
+    { path: '/tenant/maintenance', icon: FaTools, label: 'Maintenance' },
   ];
 
   const isActive = (path) => {
-    if (path === '/tenant-panel') {
-      return location.pathname === '/tenant-panel';
+    if (path === '/tenant') {
+      return location.pathname === '/tenant';
     }
     return location.pathname.startsWith(path);
   };
@@ -33,24 +41,26 @@ const TenantPanelLayout = ({ children }) => {
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
-      <div className="w-64 bg-[#0a2540] text-white flex flex-col">
+      <div className="w-64 bg-gray-900 text-white flex flex-col">
         {/* Logo */}
         <div className="p-6 flex items-center gap-3">
-          <div className="w-10 h-10 bg-teal-500 rounded-lg flex items-center justify-center font-bold text-white">
-            RH
+          <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white">
+            JR
           </div>
-          <span className="text-xl font-bold">RentalHub</span>
+          <span className="text-xl font-bold">JoinRental</span>
         </div>
 
         {/* User Info */}
-        <div className="px-6 py-4 bg-[#0d2d4d] mx-4 rounded-lg mb-4">
+        <div className="px-6 py-4 bg-gray-800 mx-4 rounded-lg mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-teal-500 rounded-full flex items-center justify-center text-white font-bold">
-              TU
+            <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+              {user ? `${user.firstName?.charAt(0)}${user.lastName?.charAt(0)}` : 'TU'}
             </div>
             <div>
-              <p className="font-semibold text-sm">Tenant User</p>
-              <p className="text-xs text-gray-400">456 Oak Street</p>
+              <p className="font-semibold text-sm">
+                {user ? `${user.firstName} ${user.lastName}` : 'Tenant User'}
+              </p>
+              <p className="text-xs text-gray-400">Tenant</p>
             </div>
           </div>
         </div>
@@ -66,8 +76,8 @@ const TenantPanelLayout = ({ children }) => {
                 to={item.path}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg mb-2 transition-colors ${
                   active
-                    ? 'bg-teal-500 text-white'
-                    : 'text-gray-300 hover:bg-[#0d2d4d] hover:text-white'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                 }`}
               >
                 <Icon className="text-lg" />
@@ -78,17 +88,20 @@ const TenantPanelLayout = ({ children }) => {
         </nav>
 
         {/* Bottom Actions */}
-        <div className="p-4 border-t border-[#0d2d4d] space-y-2">
-          <button className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-[#0d2d4d] w-full transition-colors">
-            <FaQuestionCircle className="text-lg" />
-            <span>Settings</span>
-          </button>
+        <div className="p-4 border-t border-gray-800">
           <button
-            onClick={() => navigate('/')}
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-[#0d2d4d] w-full transition-colors"
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-red-400 hover:bg-gray-800 w-full transition-colors"
           >
             <FaSignOutAlt className="text-lg" />
-            <span>Logout</span>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center">
+                <span className="text-sm font-bold">
+                  {user?.firstName?.charAt(0) || 'T'}
+                </span>
+              </div>
+              <span>Logout</span>
+            </div>
           </button>
         </div>
       </div>
@@ -103,19 +116,16 @@ const TenantPanelLayout = ({ children }) => {
               <input
                 type="text"
                 placeholder="Search..."
-                className="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-500 w-64 bg-gray-50"
+                className="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 w-64 bg-gray-50"
               />
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <FaQuestionCircle className="text-gray-600" />
-            </button>
-            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <FaMoon className="text-gray-600" />
-            </button>
             <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative">
               <FaBell className="text-gray-600" />
+            </button>
+            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+              <FaCog className="text-gray-600" />
             </button>
           </div>
         </header>

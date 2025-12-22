@@ -185,6 +185,10 @@ const propertySchema = new mongoose.Schema({
     default: false
   },
   verificationDate: Date,
+  featured: {
+    type: Boolean,
+    default: false
+  },
   
   // Statistics
   views: {
@@ -219,6 +223,7 @@ const propertySchema = new mongoose.Schema({
 
 // Virtual for property type display
 propertySchema.virtual('propertyTypeDisplay').get(function() {
+  if (!this.propertyType) return '';
   return this.propertyType.charAt(0).toUpperCase() + this.propertyType.slice(1);
 });
 
@@ -236,6 +241,27 @@ propertySchema.virtual('bhkFormat').get(function() {
 propertySchema.virtual('primaryImage').get(function() {
   const primary = this.images.find(img => img.isPrimary);
   return primary ? primary.url : (this.images.length > 0 ? this.images[0].url : null);
+});
+
+// Virtual fields to match frontend expectations
+propertySchema.virtual('rentAmount').get(function() {
+  return this.rent?.amount || 0;
+});
+
+propertySchema.virtual('depositAmount').get(function() {
+  return this.securityDeposit;
+});
+
+propertySchema.virtual('furnishingType').get(function() {
+  return this.furnishingStatus;
+});
+
+propertySchema.virtual('tenantPreference').get(function() {
+  return this.preferences?.tenantType || 'any';
+});
+
+propertySchema.virtual('areaValue').get(function() {
+  return this.area?.value || 0;
 });
 
 // Pre-save middleware to generate slug

@@ -91,8 +91,8 @@ const authReducer = (state, action) => {
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  // API Base URL
-  const API_BASE_URL = 'http://localhost:5000/api';
+  // API Base URL - using proxy
+  const API_BASE_URL = '/api';
 
   // Check if user is logged in on app start
   useEffect(() => {
@@ -160,8 +160,15 @@ export const AuthProvider = ({ children }) => {
         payload: { user: data.user, token: data.token }
       });
 
-      return { success: true, user: data.user };
+      const dashboardRoute = getDashboardRoute(data.user.role);
+
+      return { 
+        success: true, 
+        user: data.user, 
+        redirectTo: dashboardRoute 
+      };
     } catch (error) {
+      console.error('Login error:', error);
       dispatch({ 
         type: AUTH_ACTIONS.LOGIN_FAILURE, 
         payload: error.message 
@@ -188,7 +195,7 @@ export const AuthProvider = ({ children }) => {
         payload: { user: data.user, token: data.token }
       });
 
-      return { success: true, user: data.user };
+      return { success: true, user: data.user, redirectTo: getDashboardRoute(data.user.role) };
     } catch (error) {
       dispatch({ 
         type: AUTH_ACTIONS.REGISTER_FAILURE, 

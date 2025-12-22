@@ -14,12 +14,18 @@ import reviewRoutes from './routes/reviews.js';
 import paymentRoutes from './routes/payments.js';
 import adminRoutes from './routes/admin.js';
 import publicRoutes from './routes/public.js';
+import likedPropertiesRoutes from './routes/likedProperties.js';
+import rentalRequestsRoutes from './routes/rentalRequests.js';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler.js';
 
 // Load environment variables
 dotenv.config();
+
+// Configure Cloudinary after environment variables are loaded
+import { configureCloudinary } from './config/cloudinary.js';
+configureCloudinary();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -63,6 +69,8 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/public', publicRoutes);
+app.use('/api/liked-properties', likedPropertiesRoutes);
+app.use('/api/rental-requests', rentalRequestsRoutes);
 
 // Static files for uploads
 app.use('/uploads', express.static('uploads'));

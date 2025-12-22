@@ -74,7 +74,7 @@ const PropertiesManagement = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       <FaDollarSign className="text-gray-500" />
-                      <span className="text-sm font-semibold text-green-600">{property.rent}/mo</span>
+                      <span className="text-sm font-semibold text-green-600">₹{property.rent?.amount || property.rentAmount || 0}/mo</span>
                     </div>
                   </div>
                 </div>
