@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   FaUsers, 
   FaBuilding, 
@@ -23,11 +23,59 @@ import {
 } from 'recharts';
 
 const AdminDashboard = () => {
+  const [dashboardData, setDashboardData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/admin/dashboard', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setDashboardData(data.data);
+      } else {
+        setError(data.message || 'Failed to fetch dashboard data');
+      }
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+      setError('Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <p className="text-red-600">{error}</p>
+      </div>
+    );
+  }
+
   const stats = [
     { 
       label: 'Total Users', 
-      value: '2,543', 
-      change: '+12.5%',
+      value: dashboardData?.overview?.users?.total || 0, 
+      change: `+${dashboardData?.overview?.users?.growthPercentage || 0}%`,
       icon: FaUsers, 
       color: 'bg-blue-500',
       bgLight: 'bg-blue-50',
@@ -35,7 +83,7 @@ const AdminDashboard = () => {
     },
     { 
       label: 'Active Properties', 
-      value: '1,284', 
+      value: dashboardData?.overview?.properties?.active || 0, 
       change: '+8.2%',
       icon: FaBuilding, 
       color: 'bg-teal-500',
@@ -44,16 +92,16 @@ const AdminDashboard = () => {
     },
     { 
       label: 'Monthly Revenue', 
-      value: '$124.5K', 
-      change: '+15.3%',
+      value: `₹${((dashboardData?.overview?.revenue?.thisMonth || 0) / 1000).toFixed(1)}K`, 
+      change: `+${dashboardData?.overview?.revenue?.growthPercentage || 0}%`,
       icon: FaDollarSign, 
       color: 'bg-green-500',
       bgLight: 'bg-green-50',
       textColor: 'text-green-600'
     },
     { 
-      label: 'Platform Health', 
-      value: '99.8%', 
+      label: 'Active Bookings', 
+      value: dashboardData?.overview?.bookings?.active || 0, 
       change: '+0.2%',
       icon: FaChartLine, 
       color: 'bg-purple-500',
@@ -62,50 +110,33 @@ const AdminDashboard = () => {
     },
   ];
 
-  const userGrowthData = [
-    { month: 'Jan', users: 1800 },
-    { month: 'Feb', users: 1950 },
-    { month: 'Mar', users: 2100 },
-    { month: 'Apr', users: 2200 },
-    { month: 'May', users: 2350 },
-    { month: 'Jun', users: 2543 },
-  ];
+  // Transform user growth data for chart
+  const userGrowthData = dashboardData?.charts?.userGrowth?.map(item => ({
+    month: `${item._id.month}/${item._id.year}`,
+    users: item.count
+  })) || [];
 
   const quickStats = [
-    { label: 'New Users (Today)', value: '142', color: 'bg-blue-100 text-blue-700' },
-    { label: 'Pending Verifications', value: '23', color: 'bg-yellow-100 text-yellow-700' },
-    { label: 'Active Leases', value: '1,089', color: 'bg-pink-100 text-pink-700' },
+    { label: 'New Users (This Month)', value: dashboardData?.overview?.users?.newThisMonth || 0, color: 'bg-blue-100 text-blue-700' },
+    { label: 'Pending Bookings', value: dashboardData?.overview?.bookings?.pending || 0, color: 'bg-yellow-100 text-yellow-700' },
+    { label: 'Active Leases', value: dashboardData?.overview?.bookings?.active || 0, color: 'bg-pink-100 text-pink-700' },
   ];
 
   const recentActivity = [
-    { 
-      title: 'New property listed', 
-      description: 'Luxury Apartment - Downtown', 
-      time: '2 mins ago',
-      icon: FaHome,
-      iconColor: 'text-blue-500'
-    },
-    { 
-      title: 'User verification', 
-      description: 'John Doe verification pending review', 
-      time: '5 mins ago',
+    ...(dashboardData?.recentActivity?.users?.slice(0, 2).map(user => ({
+      title: 'New user registered',
+      description: `${user.firstName} ${user.lastName} - ${user.role}`,
+      time: new Date(user.createdAt).toLocaleString(),
       icon: FaUserCheck,
-      iconColor: 'text-orange-500'
-    },
-    { 
-      title: 'Payment received', 
-      description: 'Monthly subscription renewal processed', 
-      time: '12 mins ago',
-      icon: FaCheckCircle,
+      iconColor: 'text-blue-500'
+    })) || []),
+    ...(dashboardData?.recentActivity?.properties?.slice(0, 2).map(property => ({
+      title: 'New property listed',
+      description: `${property.title} - ${property.location?.city}`,
+      time: new Date(property.createdAt).toLocaleString(),
+      icon: FaHome,
       iconColor: 'text-green-500'
-    },
-    { 
-      title: 'Lease agreement', 
-      description: 'New lease signed between tenant & owner', 
-      time: '1 hour ago',
-      icon: FaFileContract,
-      iconColor: 'text-purple-500'
-    },
+    })) || [])
   ];
 
   return (

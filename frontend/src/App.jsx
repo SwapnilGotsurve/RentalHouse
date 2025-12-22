@@ -28,6 +28,7 @@ import AdminPanel from "./pages/admin/AdminPanel";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UsersManagement from "./pages/admin/UsersManagement";
 import PropertiesManagement from "./pages/admin/PropertiesManagement";
+import BookingsManagement from "./pages/admin/BookingsManagement";
 import RevenueAnalytics from "./pages/admin/RevenueAnalytics";
 import SystemMonitoring from "./pages/admin/SystemMonitoring";
 
@@ -122,6 +123,7 @@ function App() {
             <Route index element={<AdminDashboard />} />
             <Route path="users" element={<UsersManagement />} />
             <Route path="properties" element={<PropertiesManagement />} />
+            <Route path="bookings" element={<BookingsManagement />} />
             <Route path="analytics" element={<RevenueAnalytics />} />
             <Route path="system-monitoring" element={<SystemMonitoring />} />
           </Route>
@@ -135,6 +137,7 @@ function App() {
             <Route index element={<AdminDashboard />} />
             <Route path="users" element={<UsersManagement />} />
             <Route path="properties" element={<PropertiesManagement />} />
+            <Route path="bookings" element={<BookingsManagement />} />
             <Route path="analytics" element={<RevenueAnalytics />} />
             <Route path="system-monitoring" element={<SystemMonitoring />} />
           </Route>

@@ -209,7 +209,7 @@ router.get('/dashboard', asyncHandler(async (req, res) => {
 // @desc    Get user management data
 // @route   GET /api/admin/users
 // @access  Private/Admin
-router.get('/users', checkAdminPermission('users'), asyncHandler(async (req, res) => {
+router.get('/users',  asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 20;
   const skip = (page - 1) * limit;
@@ -300,7 +300,7 @@ router.get('/users', checkAdminPermission('users'), asyncHandler(async (req, res
 // @desc    Get property management data
 // @route   GET /api/admin/properties
 // @access  Private/Admin
-router.get('/properties', checkAdminPermission('properties'), asyncHandler(async (req, res) => {
+router.get('/properties',  asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 20;
   const skip = (page - 1) * limit;
@@ -397,7 +397,7 @@ router.get('/properties', checkAdminPermission('properties'), asyncHandler(async
 // @desc    Get revenue analytics
 // @route   GET /api/admin/analytics/revenue
 // @access  Private/Admin
-router.get('/analytics/revenue', checkAdminPermission('analytics'), asyncHandler(async (req, res) => {
+router.get('/analytics/revenue',  asyncHandler(async (req, res) => {
   const { period = '6months' } = req.query;
   
   let startDate;
@@ -552,7 +552,7 @@ router.get('/analytics/revenue', checkAdminPermission('analytics'), asyncHandler
 // @desc    Get system monitoring data
 // @route   GET /api/admin/system
 // @access  Private/Admin
-router.get('/system', checkAdminPermission('system'), asyncHandler(async (req, res) => {
+router.get('/system',  asyncHandler(async (req, res) => {
   // Database statistics
   const dbStats = {
     users: await User.countDocuments(),
@@ -624,7 +624,6 @@ router.get('/system', checkAdminPermission('system'), asyncHandler(async (req, r
 // @route   PATCH /api/admin/users/:id/status
 // @access  Private/Admin
 router.patch('/users/:id/status',
-  checkAdminPermission('users'),
   validateObjectIdParam('id'),
   asyncHandler(async (req, res) => {
     const { isActive, isVerified } = req.body;
@@ -674,7 +673,6 @@ router.patch('/users/:id/status',
 // @route   PATCH /api/admin/properties/:id/status
 // @access  Private/Admin
 router.patch('/properties/:id/status',
-  checkAdminPermission('properties'),
   validateObjectIdParam('id'),
   asyncHandler(async (req, res) => {
     const { isActive, isVerified } = req.body;
