@@ -14,7 +14,9 @@ const Hero2 = () => {
           tomorrow.
         </p>
 
-        <button className="bg-orange-500 hover:bg-orange-600 text-white rounded-full px-8 py-4 text-lg font-semibold flex items-center gap-3 justify-center mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+<button
+        onClick={() => window.location.href = '/tenant'}
+        className="bg-orange-500 hover:bg-orange-600 text-white rounded-full px-8 py-4 text-lg font-semibold flex items-center gap-3 justify-center mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
           Get Started Now
           <FaArrowRightLong />
         </button>
